@@ -31,13 +31,14 @@ body {
    LOGIN/SIGNUP PAGE STYLES
    ======================================== */
 
+/* Form container - simplified display logic */
 .form-container {
     display: none;
     animation: fadeIn 0.3s ease-in-out;
 }
 
 .form-container.active {
-    display: block;
+    display: block !important;
 }
 
 @keyframes fadeIn {
