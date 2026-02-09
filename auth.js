@@ -53,14 +53,33 @@ function togglePassword(inputId) {
     input.type = input.type === 'password' ? 'text' : 'password';
 }
 
-// Show signup/login forms
+// Show signup/login forms with explicit display control
 function showSignup() {
-    document.getElementById('loginForm')?.classList.remove('active');
-    document.getElementById('signupForm')?.classList.add('active');
+    const loginForm = document.getElementById('loginForm');
+    const signupForm = document.getElementById('signupForm');
+    
+    if (loginForm) {
+        loginForm.classList.remove('active');
+        loginForm.style.display = 'none';
+    }
+    if (signupForm) {
+        signupForm.classList.add('active');
+        signupForm.style.display = 'block';
+    }
 }
+
 function showLogin() {
-    document.getElementById('signupForm')?.classList.remove('active');
-    document.getElementById('loginForm')?.classList.add('active');
+    const loginForm = document.getElementById('loginForm');
+    const signupForm = document.getElementById('signupForm');
+    
+    if (signupForm) {
+        signupForm.classList.remove('active');
+        signupForm.style.display = 'none';
+    }
+    if (loginForm) {
+        loginForm.classList.add('active');
+        loginForm.style.display = 'block';
+    }
 }
 
 // Handle signup
@@ -139,15 +158,35 @@ function handleLogin(e) {
     }, 300);
 }
 
-// Initialize
+// Initialize on page load
 document.addEventListener('DOMContentLoaded', function () {
     initializeDefaultUsers();
     checkExistingSession();
 
+    // Ensure login form is visible by default
+    const loginForm = document.getElementById('loginForm');
+    const signupForm = document.getElementById('signupForm');
+    
+    if (loginForm) {
+        loginForm.style.display = 'block';
+        loginForm.classList.add('active');
+    }
+    if (signupForm) {
+        signupForm.style.display = 'none';
+        signupForm.classList.remove('active');
+    }
+
+    // Attach event listeners
     document.getElementById('loginFormElement')?.addEventListener('submit', handleLogin);
     document.getElementById('signupFormElement')?.addEventListener('submit', handleSignup);
-    document.getElementById('showSignupLink')?.addEventListener('click', e => { e.preventDefault(); showSignup(); });
-    document.getElementById('showLoginLink')?.addEventListener('click', e => { e.preventDefault(); showLogin(); });
+    document.getElementById('showSignupLink')?.addEventListener('click', e => { 
+        e.preventDefault(); 
+        showSignup(); 
+    });
+    document.getElementById('showLoginLink')?.addEventListener('click', e => { 
+        e.preventDefault(); 
+        showLogin(); 
+    });
 
     window.togglePassword = togglePassword;
 });
