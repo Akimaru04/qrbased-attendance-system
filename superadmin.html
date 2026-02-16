@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Super Admin Panel</title>
+<link rel="stylesheet" href="/assets/css/superadmin.css">
+<!-- Chart.js for graphs -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<div class="container">
+    <h1>Super Admin Dashboard</h1>
+
+    <!-- Dashboard Stats -->
+    <div class="dashboard-stats">
+        <div class="stat-card">
+            <h3>Total Admins</h3>
+            <p id="totalAdmins">0</p>
+        </div>
+        <div class="stat-card">
+            <h3>Total Students</h3>
+            <p id="totalStudents">0</p>
+        </div>
+        <div class="stat-card">
+            <h3>Pending Students</h3>
+            <p id="pendingStudents">0</p>
+        </div>
+        <div class="stat-card">
+            <h3>Verified Students</h3>
+            <p id="verifiedStudents">0</p>
+        </div>
+    </div>
+
+  <!-- Pie chart: Pending vs Verified Students -->
+<div class="charts">
+    <canvas id="studentStatusChart" width="400" height="200"></canvas>
+</div>
+
+<!-- Bar chart: Students per Admin -->
+<div class="charts">
+    <canvas id="studentsPerAdminChart" width="400" height="200"></canvas>
+</div>
+
+    <!-- Create New Admin -->
+    <form id="createAdminForm">
+        <h3>Create New Admin</h3>
+        <input type="text" name="firstName" placeholder="First Name" required>
+        <input type="text" name="lastName" placeholder="Last Name" required><br>
+        <input type="email" name="email" placeholder="Email" required>
+        <input type="password" name="password" placeholder="Password" required>
+        <button type="submit">Create Admin</button>
+    </form>
+
+    <!-- Admins Table -->
+    <h3>All Admins</h3>
+    <table id="adminsTable">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Email</th>
+                <th>Name</th>
+                <th>Created At</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <button id="logoutBtn" class="logout-btn">Logout</button>
+</div>
+
+<!-- Scripts -->
+<script src="/assets/js/auth.js"></script>
+<script src="/assets/js/superadmin.js"></script>
+</body>
+</html>

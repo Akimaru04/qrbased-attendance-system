@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - Attendance System</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="admin.css">
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsqr/dist/jsQR.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
@@ -39,7 +39,7 @@
     <main class="main-content">
         <header class="top-header">
             <div class="header-left">
-                <button class="toggle-sidebar"><i class="fas fa-bars"></i></button>
+                <button type="button" class="toggle-sidebar" title="Toggle Sidebar"><i class="fas fa-bars"></i></button>
                 <h1>Admin Dashboard</h1>
             </div>
             <div class="header-right">
@@ -191,11 +191,11 @@
                     <div class="scan-header">
                         <div class="form-group">
                             <label>Select Event</label>
-                            <select id="eventSelect" class="form-control" onchange="selectEvent()">
+                            <select id="eventSelect" class="form-control" onchange="selectEvent()" title="Select an event for attendance scanning">
                                 <option value="">-- Select an Event --</option>
                             </select>
                         </div>
-                        <div class="scan-stats" id="scanStats" style="display: none;">
+                        <div class="scan-stats" id="scanStats" class="hidden">
                             <div class="scan-stat">
                                 <span>Total Scanned:</span>
                                 <strong id="totalScanned">0</strong>
@@ -204,10 +204,10 @@
                     </div>
 
                     <!-- Scanner Area using jsQR -->
-                    <div class="scanner-area" id="scannerArea" style="display: none;">
+                    <div class="scanner-area" id="scannerArea" class="hidden">
                         <div class="camera-container">
-                            <video id="qrVideo" autoplay playsinline></video>
-                            <canvas id="qrCanvas" style="display: none;"></canvas>
+                            <video id="qrVideo" autoplay></video>
+                            <canvas id="qrCanvas" class="hidden"></canvas>
                             
                             <div class="scan-overlay">
                                 <div class="scan-frame"></div>
@@ -233,7 +233,7 @@
                     </div>
 
                     <!-- Event Attendance Table -->
-                    <div class="event-attendance" id="eventAttendance" style="display: none;">
+                    <div class="event-attendance" id="eventAttendance" class="hidden">
                         <h3>Event Attendance List</h3>
                         <div class="table-container">
                             <table class="data-table">
@@ -259,13 +259,13 @@
                 <h2>Attendance Reports</h2>
                 
                 <div class="report-controls">
-                    <select id="reportType" onchange="generateReport()">
+                    <select id="reportType" onchange="generateReport()" title="Select report type">
                         <option value="event">By Event</option>
                         <option value="student">By Student</option>
                         <option value="summary">Summary Report</option>
                     </select>
-                    <input type="date" id="reportStartDate">
-                    <input type="date" id="reportEndDate">
+                    <input type="date" id="reportStartDate" title="Report start date">
+                    <input type="date" id="reportEndDate" title="Report end date">
                     <button class="btn-primary" onclick="generateReport()">
                         <i class="fas fa-chart-bar"></i> Generate Report
                     </button>
@@ -299,24 +299,24 @@
             <form id="createEventForm">
                 <div class="form-group">
                     <label>Event Name*</label>
-                    <input type="text" id="eventName" class="form-control" required>
+                    <input type="text" id="eventName" class="form-control" placeholder="Enter event name" required>
                 </div>
                 <div class="form-group">
                     <label>Description*</label>
-                    <textarea id="eventDescription" class="form-control" rows="3" required></textarea>
+                    <textarea id="eventDescription" class="form-control" placeholder="Enter event description" rows="3" required></textarea>
                 </div>
                 <div class="form-group">
                     <label>Date*</label>
-                    <input type="date" id="eventDate" class="form-control" required>
+                    <input type="date" id="eventDate" class="form-control" title="Select event date" required>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
                         <label>Start Time*</label>
-                        <input type="time" id="eventStartTime" class="form-control" required>
+                        <input type="time" id="eventStartTime" class="form-control" title="Select event start time" required>
                     </div>
                     <div class="form-group">
                         <label>End Time*</label>
-                        <input type="time" id="eventEndTime" class="form-control" required>
+                        <input type="time" id="eventEndTime" class="form-control" title="Select event end time" required>
                     </div>
                 </div>
                 <button type="submit" class="btn-primary">
@@ -343,7 +343,7 @@
             <form onsubmit="submitManualEntry(event)">
                 <div class="form-group">
                     <label>Student ID*</label>
-                    <input type="text" id="manualStudentId" class="form-control" required>
+                    <input type="text" id="manualStudentId" class="form-control" placeholder="Enter student ID" required>
                 </div>
                 <button type="submit" class="btn-primary">
                     <i class="fas fa-check"></i> Mark Attendance
@@ -355,7 +355,6 @@
     <!-- Notification Toast -->
     <div id="notification" class="notification"></div>
 
-    <script src="admin.js"></script>
+    <script src="/assets/js/admin.js"></script>
 </body>
-
 </html>
