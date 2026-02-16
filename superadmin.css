@@ -33,7 +33,7 @@ h3 {
 }
 
 .stat-card {
-    flex: 0 0 220px; /* fixed width instead of flexible */
+    flex: 1 1 220px;
     background: #fff;
     padding: 20px;
     border-radius: 12px;
@@ -167,5 +167,4 @@ td button:hover {
     form#createAdminForm input {
         width: 100%;
     }
-
 }
