@@ -382,44 +382,35 @@ function openVerifyModal(userId) {
 }
 
 function verifyStudent(userId) {
-    const user = users.find(u => u.id === userId);
-    if (!user) return;
+    const qrContainer = document.createElement('div');
+    qrContainer.style.width = '256px';
+    qrContainer.style.height = '256px';
+    qrContainer.style.background = '#fff';
+    document.body.appendChild(qrContainer);
 
-    const qrData = user.id;
-
-    const tempDiv = document.createElement('div');
-    tempDiv.style.position = 'absolute';
-    tempDiv.style.left = '-9999px';
-    document.body.appendChild(tempDiv);
-
-    const qr = new QRCode(tempDiv, {
-        text: qrData,
+    const qr = new QRCode(qrContainer, {
+        text: `student_id=${user.id}&event_id=1`,
         width: 256,
-        height: 256
+        height: 256,
+        colorDark: "#000000",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.H
     });
 
     setTimeout(() => {
-        const qrImage = tempDiv.querySelector('img');
-        if (!qrImage) {
-            document.body.removeChild(tempDiv);
-            showNotification('Error generating QR code', 'error');
+        const qrImg = qrContainer.querySelector('img');
+        if (!qrImg) {
+            console.error('QR generation failed');
+            document.body.removeChild(qrContainer);
             return;
         }
-
-        user.qrCode = qrImage.src;
+        user.qrCode = qrImg.src;
         user.status = 'verified';
 
-        const userIndex = users.findIndex(u => u.id === userId);
-        users[userIndex] = user;
-        localStorage.setItem('users', JSON.stringify(users));
+        document.body.removeChild(qrContainer);
 
-        document.body.removeChild(tempDiv);
-
-        closeModal('verifyStudentModal');
-        loadUsersTable();
-        updateDashboardStats();
-        showNotification('Student verified and QR code generated!', 'success');
-    }, 300);
+        console.log('QR generated for user:', user);
+    }, 500);
 }
 
 function viewUser(userId) {

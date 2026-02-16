@@ -1,9 +1,38 @@
+function getUsers() {
+    return JSON.parse(localStorage.getItem('users') || '[]');
+}
+
+function saveUsers(users) {
+    localStorage.setItem('users', JSON.stringify(users));
+}
+
+function getCurrentUser() {
+    return JSON.parse(localStorage.getItem('currentUser') || 'null');
+}
+
+function saveCurrentUser(user) {
+    localStorage.setItem('currentUser', JSON.stringify(user));
+}
+
 // Initialize default admin
 function initializeDefaultUsers() {
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
-    const adminExists = users.some(u => u.email === 'hckthon2026@gmail.com');
-    if (!adminExists) {
-        const defaultAdmin = {
+    const users = getUsers();
+
+    if (!users.some(u => u.email === 'superadmin@gmail.com')) {
+        users.push({
+            id: 'superadmin_' + Date.now(),
+            email: 'superadmin@gmail.com',
+            password: 'superadmin123',
+            role: 'super_admin',
+            firstName: 'Super',
+            lastName: 'Admin',
+            createdAt: new Date().toISOString()
+        });
+        console.log('Default super admin created');
+    }
+
+    if (!users.some(u => u.email === 'hckthon2026@gmail.com')) {
+        users.push({
             id: 'admin_' + Date.now(),
             email: 'hckthon2026@gmail.com',
             password: 'hckthon2026',
@@ -11,12 +40,13 @@ function initializeDefaultUsers() {
             firstName: 'Admin',
             lastName: 'User',
             createdAt: new Date().toISOString()
-        };
-        users.push(defaultAdmin);
-        localStorage.setItem('users', JSON.stringify(users));
+        });
         console.log('Default admin created');
     }
+
+    saveUsers(users);
 }
+
 
 // Get all users
 function getUsers() {
@@ -40,11 +70,46 @@ function saveCurrentUser(user) {
 
 // Redirect if already logged in
 function checkExistingSession() {
-    const currentUser = getCurrentUser();
-    if (!currentUser) return;
-    if (currentUser.role === 'admin') window.location.href = 'admin.html';
-    else if (currentUser.role === 'student') window.location.href = 'user.html';
+    const user = getCurrentUser();
+    if (!user) return;
+    if (user.role === 'super_admin') window.location.href = 'superadmin.html';
+    else if (user.role === 'admin') window.location.href = 'admin.html';
+    else window.location.href = 'user.html';
 }
+
+function createAdmin(userData) {
+    const currentUser = getCurrentUser();
+    if (!currentUser || currentUser.role !== 'super_admin') {
+        return alert('Only Super Admins can create Admins!');
+    }
+
+    const users = getUsers();
+    users.push({
+        id: 'admin_' + Date.now(),
+        email: userData.email,
+        password: userData.password,
+        role: 'admin',
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        createdAt: new Date().toISOString()
+    });
+
+    saveUsers(users);
+    alert('Admin created successfully!');
+}
+
+function deleteAdmin(adminId) {
+    const currentUser = getCurrentUser();
+    if (!currentUser || currentUser.role !== 'super_admin') {
+        return alert('Only Super Admins can delete Admins!');
+    }
+
+    let users = getUsers();
+    users = users.filter(u => u.id !== adminId || u.role !== 'admin');
+    saveUsers(users);
+    alert('Admin deleted successfully!');
+}
+
 
 // Toggle password visibility
 function togglePassword(inputId) {
@@ -94,27 +159,19 @@ function handleSignup(e) {
     const confirmPassword = formData.get('confirm_password');
 
     if (!studentId || !firstName || !lastName || !email || !password) {
-        alert('Please fill in all fields');
-        return;
+        return alert('Please fill in all fields');
     }
-
-    if (password !== confirmPassword) {
-        alert('Passwords do not match');
-        return;
-    }
+    if (password !== confirmPassword) return alert('Passwords do not match');
 
     const users = getUsers();
     if (users.some(u => u.email.toLowerCase() === email)) {
-        alert('Email already registered');
-        showLogin();
-        return;
+        alert('Email already registered'); return;
     }
     if (users.some(u => u.studentId === studentId)) {
-        alert('Student ID already registered');
-        return;
+        alert('Student ID already registered'); return;
     }
 
-    const newUser = {
+    users.push({
         id: 'student_' + Date.now(),
         studentId,
         firstName,
@@ -126,13 +183,11 @@ function handleSignup(e) {
         qrCode: null,
         profilePhoto: null,
         createdAt: new Date().toISOString()
-    };
+    });
 
-    users.push(newUser);
     saveUsers(users);
     alert('Registration successful! Pending admin verification.');
     e.target.reset();
-    showLogin();
 }
 
 // Handle login
@@ -142,18 +197,14 @@ function handleLogin(e) {
     const email = formData.get('email')?.trim().toLowerCase();
     const password = formData.get('password');
 
-    const users = getUsers();
-    const user = users.find(u => u.email.toLowerCase() === email && u.password === password);
-
-    if (!user) {
-        alert('Invalid email or password');
-        return;
-    }
+    const user = getUsers().find(u => u.email.toLowerCase() === email && u.password === password);
+    if (!user) return alert('Invalid email or password');
 
     saveCurrentUser(user);
     alert('Login successful! Redirecting...');
     setTimeout(() => {
-        if (user.role === 'admin') window.location.href = 'admin.html';
+        if (user.role === 'super_admin') window.location.href = 'superadmin.html';
+        else if (user.role === 'admin') window.location.href = 'admin.html';
         else window.location.href = 'user.html';
     }, 300);
 }
