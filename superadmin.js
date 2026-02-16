@@ -127,4 +127,3 @@ document.getElementById('logoutBtn').addEventListener('click', () => {
 
 // Initial load
 loadAdmins();
-updatestats();
