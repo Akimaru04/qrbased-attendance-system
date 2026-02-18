@@ -357,27 +357,32 @@ function clearUserSearch() {
 function openVerifyModal(userId) {
     const user = users.find(u => u.id === userId);
     if (!user) return;
-    
+
     const modalContent = document.getElementById('verifyStudentContent');
     modalContent.innerHTML = `
         <div class="verify-student-info">
-            <img src="${user.profilePhoto ? user.profilePhoto : 'assets/images/default-avatar.png'}"
-            alt="Profile" class="table-avatar" loading="lazy" decoding="async">
+            <img src="${user.profilePhoto || 'assets/images/default-avatar.png'}" alt="Profile" class="table-avatar">
             <h3>${user.firstName} ${user.lastName}</h3>
             <p><strong>Student ID:</strong> ${user.studentId}</p>
             <p><strong>Email:</strong> ${user.email}</p>
             <p><strong>Registered:</strong> ${new Date(user.createdAt).toLocaleString()}</p>
         </div>
         <div class="verify-actions">
-            <button class="btn-primary" onclick="verifyStudent('${user.id}')">
+            <button class="btn-primary">
                 <i class="fas fa-check"></i> Verify & Generate QR Code
             </button>
-            <button class="btn-secondary" onclick="closeModal('verifyStudentModal')">
+            <button class="btn-secondary">
                 Cancel
             </button>
         </div>
     `;
-    
+
+    const verifyBtn = modalContent.querySelector('.btn-primary');
+    const cancelBtn = modalContent.querySelector('.btn-secondary');
+
+    verifyBtn.addEventListener('click', () => verifyStudent(user.id));
+    cancelBtn.addEventListener('click', () => closeModal('verifyStudentModal'));
+
     openModal('verifyStudentModal');
 }
 
@@ -388,11 +393,12 @@ function verifyStudent(userId) {
     const qrContainer = document.createElement('div');
     qrContainer.style.width = '256px';
     qrContainer.style.height = '256px';
-    qrContainer.style.background = '#fff';
+    qrContainer.style.position = 'absolute';
+    qrContainer.style.left = '-9999px';
     document.body.appendChild(qrContainer);
 
     const qr = new QRCode(qrContainer, {
-        text: user.id,   // ✅ ONLY ID
+        text: user.id,
         width: 256,
         height: 256,
         colorDark: "#000000",
@@ -400,27 +406,22 @@ function verifyStudent(userId) {
         correctLevel: QRCode.CorrectLevel.H
     });
 
-    setTimeout(() => {
+    // Wait until QR image is rendered
+    const checkQR = setInterval(() => {
         const qrImg = qrContainer.querySelector('img');
-        if (!qrImg) {
+        if (qrImg && qrImg.src) {
+            clearInterval(checkQR);
+            user.qrCode = qrImg.src;
+            user.status = 'verified';
+            localStorage.setItem('users', JSON.stringify(users));
             document.body.removeChild(qrContainer);
-            return;
+            loadUsersTable();
+            updateDashboardStats();
+            showNotification('Student verified and QR generated!', 'success');
         }
-
-        user.qrCode = qrImg.src;
-        user.status = 'verified';
-
-        // ✅ SAVE USERS
-        localStorage.setItem('users', JSON.stringify(users));
-
-        document.body.removeChild(qrContainer);
-
-        loadUsersTable();
-        updateDashboardStats();
-
-        showNotification('Student verified and QR generated!', 'success');
-    }, 500);
+    }, 100);
 }
+
 
 function viewUser(userId) {
     const user = users.find(u => u.id === userId);
