@@ -72,9 +72,18 @@ function saveCurrentUser(user) {
 function checkExistingSession() {
     const user = getCurrentUser();
     if (!user) return;
-    if (user.role === 'super_admin') window.location.href = 'superadmin.html';
-    else if (user.role === 'admin') window.location.href = 'admin.html';
-    else window.location.href = 'user.html';
+
+    const currentPage = window.location.pathname;
+
+    if (user.role === 'super_admin' && !currentPage.includes('superadmin.html')) {
+        window.location.href = 'superadmin.html';
+    } 
+    else if (user.role === 'admin' && !currentPage.includes('admin.html')) {
+        window.location.href = 'admin.html';
+    } 
+    else if (user.role === 'student' && !currentPage.includes('user.html')) {
+        window.location.href = 'user.html';
+    }
 }
 
 function createAdmin(userData) {
