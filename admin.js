@@ -170,30 +170,37 @@ function updateAttendanceChart() {
 function initializeVerificationChart() {
     const canvas = document.getElementById('verificationChart');
     if (!canvas) return;
-    
+
     const ctx = canvas.getContext('2d');
-    
+
     const students = users.filter(u => u.role === 'student');
     const pending = students.filter(u => u.status === 'pending').length;
     const verified = students.filter(u => u.status === 'verified').length;
-    
-    new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-            labels: ['Verified', 'Pending'],
-            datasets: [{
-                data: [verified, pending],
-                backgroundColor: ['#28a745', '#ffc107']
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: true,
-            plugins: {
-                legend: { position: 'bottom' }
+
+    if (verificationChartInstance) {
+        // Update existing chart
+        verificationChartInstance.data.datasets[0].data = [verified, pending];
+        verificationChartInstance.update();
+    } else {
+        // Create new chart
+        verificationChartInstance = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Verified', 'Pending'],
+                datasets: [{
+                    data: [verified, pending],
+                    backgroundColor: ['#28a745', '#ffc107']
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: { position: 'bottom' }
+                }
             }
-        }
-    });
+        });
+    }
 }
 
 function loadUsersTable() {
@@ -417,6 +424,7 @@ function verifyStudent(userId) {
             document.body.removeChild(qrContainer);
             loadUsersTable();
             updateDashboardStats();
+            initializeVerificationChart(); // ✅ refresh the pie chart
             showNotification('Student verified and QR generated!', 'success');
         }
     }, 100);
