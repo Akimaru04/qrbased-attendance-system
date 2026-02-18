@@ -36,47 +36,53 @@ function loadAdmins() {
 
 // ----------------- Render Students Per Admin Bar Chart -----------------
 function renderStudentsPerAdminChart() {
-        const users = getUsers();
-        const admins = users.filter(u => u.role === 'admin');
-        const students = users.filter(u => u.role === 'student');
+    const users = getUsers(); // must return hardcoded admin + students
+    const admins = users.filter(u => u.role === 'admin');
+    const students = users.filter(u => u.role === 'student');
 
-        const adminLabels = admins.map(a => a.firstName + ' ' + a.lastName);
-        const studentCounts = admins.map(admin =>
-            students.filter(s => s.assignedAdminId === admin.id).length
-        );
+    if (!admins.length) return;
 
-        const ctx = document.getElementById('studentsPerAdminChart')?.getContext('2d');
-        if (!ctx) return;
+    const adminLabels = admins.map(a => a.firstName + ' ' + a.lastName);
+    const studentCounts = admins.map(admin =>
+        students.filter(s => s.assignedAdminId === admin.id).length
+    );
 
-        if (studentsPerAdminChart) studentsPerAdminChart.destroy();
+    console.log("Admins:", adminLabels);
+    console.log("Student counts:", studentCounts); // should show non-zero values
 
-        studentsPerAdminChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: adminLabels,
-                datasets: [{
-                    label: 'Number of Students',
-                    data: studentCounts
-                }]
+    const canvas = document.getElementById('studentsPerAdminChart');
+    canvas.height = 400;
+    const ctx = canvas.getContext('2d');
+
+    if (studentsPerAdminChart) studentsPerAdminChart.destroy();
+
+    studentsPerAdminChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: adminLabels,
+            datasets: [{
+                label: 'Number of Students',
+                data: studentCounts,
+                backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1,
+                borderRadius: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                title: { display: true, text: 'Students Per Admin' }
             },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: { display: false },
-                    title: {
-                        display: true,
-                        text: 'Students Per Admin'
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: { precision: 0 }
-                    }
-                }
+            scales: {
+                y: { beginAtZero: true, ticks: { precision: 0 } },
+                x: { ticks: { autoSkip: false } }
             }
-        });
-    }
+        }
+    });
+}
 
 function updateStats() {
         const users = getUsers();
@@ -126,7 +132,7 @@ createAdminForm?.addEventListener('submit', e => {
 // Logout
 logoutBtn?.addEventListener('click', () => {
         saveCurrentUser(null);
-        window.location.replace('/index.html');
+        window.location.replace('index.html');
     });
 
 // Initial load
