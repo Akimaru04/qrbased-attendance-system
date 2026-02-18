@@ -382,6 +382,9 @@ function openVerifyModal(userId) {
 }
 
 function verifyStudent(userId) {
+    const user = users.find(u => u.id === userId);
+    if (!user) return;
+
     const qrContainer = document.createElement('div');
     qrContainer.style.width = '256px';
     qrContainer.style.height = '256px';
@@ -389,7 +392,7 @@ function verifyStudent(userId) {
     document.body.appendChild(qrContainer);
 
     const qr = new QRCode(qrContainer, {
-        text: `student_id=${user.id}&event_id=1`,
+        text: user.id,   // ✅ ONLY ID
         width: 256,
         height: 256,
         colorDark: "#000000",
@@ -400,16 +403,22 @@ function verifyStudent(userId) {
     setTimeout(() => {
         const qrImg = qrContainer.querySelector('img');
         if (!qrImg) {
-            console.error('QR generation failed');
             document.body.removeChild(qrContainer);
             return;
         }
+
         user.qrCode = qrImg.src;
         user.status = 'verified';
 
+        // ✅ SAVE USERS
+        localStorage.setItem('users', JSON.stringify(users));
+
         document.body.removeChild(qrContainer);
 
-        console.log('QR generated for user:', user);
+        loadUsersTable();
+        updateDashboardStats();
+
+        showNotification('Student verified and QR generated!', 'success');
     }, 500);
 }
 
@@ -839,6 +848,8 @@ function stopScanner() {
 
 // Process scanned QR code
 function processQRScan(qrData) {
+    const params = new URLSearchParams(qrData);
+    const studentId = params.get('student_id');
     qrData = qrData.trim();
     console.log("📱 Scanned QR Data:", qrData);
 
@@ -848,7 +859,7 @@ function processQRScan(qrData) {
     console.log("Total users in database:", users.length);
     console.log("User IDs in database:", users.map(u => u.id));
     
-    const student = users.find(u => u.id === qrData);
+    const student = users.find(u => u.id === studentId);
 
     if (!student) {
         console.error("❌ No student found with ID:", qrData);
