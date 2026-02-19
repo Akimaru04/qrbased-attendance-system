@@ -35,36 +35,39 @@ function loadAdmins() {
     }
 
 // ----------------- Render Students Per Admin Bar Chart -----------------
-function renderStudentsPerAdminChart() {
-    const users = getUsers(); // must return hardcoded admin + students
+let eventsPerAdminChart; // replace studentsPerAdminChart
+
+function renderEventsPerAdminChart() {
+    const users = getUsers(); // admin + students
     const admins = users.filter(u => u.role === 'admin');
-    const students = users.filter(u => u.role === 'student');
+
+    const events = getEvents(); // you must have a function that returns all events
 
     if (!admins.length) return;
 
     const adminLabels = admins.map(a => a.firstName + ' ' + a.lastName);
-    const studentCounts = admins.map(admin =>
-        students.filter(s => s.assignedAdminId === admin.id).length
+    const eventCounts = admins.map(admin =>
+        events.filter(e => e.adminId === admin.id).length
     );
 
     console.log("Admins:", adminLabels);
-    console.log("Student counts:", studentCounts); // should show non-zero values
+    console.log("Event counts:", eventCounts);
 
-    const canvas = document.getElementById('studentsPerAdminChart');
+    const canvas = document.getElementById('eventsPerAdminChart'); // update your HTML id
     canvas.height = 400;
     const ctx = canvas.getContext('2d');
 
-    if (studentsPerAdminChart) studentsPerAdminChart.destroy();
+    if (eventsPerAdminChart) eventsPerAdminChart.destroy();
 
-    studentsPerAdminChart = new Chart(ctx, {
+    eventsPerAdminChart = new Chart(ctx, {
         type: 'bar',
         data: {
             labels: adminLabels,
             datasets: [{
-                label: 'Number of Students',
-                data: studentCounts,
-                backgroundColor: 'rgba(54, 162, 235, 0.7)',
-                borderColor: 'rgba(54, 162, 235, 1)',
+                label: 'Number of Events',
+                data: eventCounts,
+                backgroundColor: 'rgba(75, 192, 192, 0.7)',
+                borderColor: 'rgba(75, 192, 192, 1)',
                 borderWidth: 1,
                 borderRadius: 4
             }]
@@ -74,7 +77,7 @@ function renderStudentsPerAdminChart() {
             maintainAspectRatio: false,
             plugins: {
                 legend: { display: false },
-                title: { display: true, text: 'Students Per Admin' }
+                title: { display: true, text: 'Events Per Admin' }
             },
             scales: {
                 y: { beginAtZero: true, ticks: { precision: 0 } },
@@ -85,23 +88,23 @@ function renderStudentsPerAdminChart() {
 }
 
 function updateStats() {
-        const users = getUsers();
-        const admins = users.filter(u => u.role === 'admin');
-        const students = users.filter(u => u.role === 'student');
-        const pending = students.filter(s => s.status === 'pending');
-        const verified = students.filter(s => s.status === 'verified');
+    const users = getUsers();
+    const admins = users.filter(u => u.role === 'admin');
+    const students = users.filter(u => u.role === 'student');
+    const pending = students.filter(s => s.status === 'pending');
+    const verified = students.filter(s => s.status === 'verified');
 
-        document.getElementById('totalAdmins').textContent = admins.length;
-        document.getElementById('totalStudents').textContent = students.length;
-        document.getElementById('pendingStudents').textContent = pending.length;
-        document.getElementById('verifiedStudents').textContent = verified.length;
+    document.getElementById('totalAdmins').textContent = admins.length;
+    document.getElementById('totalStudents').textContent = students.length;
+    document.getElementById('pendingStudents').textContent = pending.length;
+    document.getElementById('verifiedStudents').textContent = verified.length;
 
-        if (typeof renderStudentStatusChart === "function") {
-            renderStudentStatusChart(pending.length, verified.length);
-        }
-
-        renderStudentsPerAdminChart();
+    if (typeof renderStudentStatusChart === "function") {
+        renderStudentStatusChart(pending.length, verified.length);
     }
+
+    renderEventsPerAdminChart(); // updated
+}
 
 // Delete admin and reload table
 window.deleteAdminAndReload = function (adminId) {
