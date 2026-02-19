@@ -34,8 +34,8 @@ function loadAdmins() {
         updateStats();
     }
 
-// ----------------- Render Students Per Admin Bar Chart -----------------
-let eventsPerAdminChart; // replace studentsPerAdminChart
+// ----------------- Render events Per Admin Bar Chart -----------------
+let eventsPerAdminChart;
 
 function renderEventsPerAdminChart() {
     const users = getUsers(); // admin + students
