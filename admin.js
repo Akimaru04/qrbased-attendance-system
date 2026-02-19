@@ -393,9 +393,14 @@ function openVerifyModal(userId) {
     openModal('verifyStudentModal');
 }
 
-function verifyStudent(userId) {
+function verifyStudent(userId){
     const user = users.find(u => u.id === userId);
     if (!user) return;
+
+    user.status = 'verified';
+    user.assignedAdminId = currentAdmin.id;
+
+    localStorage.setItem('users', JSON.stringify(users));
 
     const qrContainer = document.createElement('div');
     qrContainer.style.width = '256px';
