@@ -155,6 +155,7 @@ body {
 .content {
     flex: 1;
     padding: 2rem;
+    min-height: 100vh;
     background: #f0f2f5;
 }
 
