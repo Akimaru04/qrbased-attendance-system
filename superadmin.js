@@ -41,7 +41,7 @@ function renderEventsPerAdminChart() {
 
     const users = getUsers();
     const admins = users.filter(u => u.role === 'admin');
-    const events = getEvents();
+    const events = JSON.parse(localStorage.getItem('events')) || [];
 
     const canvas = document.getElementById('eventsPerAdminChart');
     if (!canvas) return;

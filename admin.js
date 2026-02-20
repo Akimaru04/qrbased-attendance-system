@@ -502,15 +502,16 @@ function createEvent(e) {
     e.preventDefault();
 
     const newEvent = {
-        id: 'event_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
-        name: document.getElementById('eventName').value,
-        description: document.getElementById('eventDescription').value,
-        date: document.getElementById('eventDate').value,
-        startTime: document.getElementById('eventStartTime').value,
-        endTime: document.getElementById('eventEndTime').value,
-        status: 'active',
-        createdAt: new Date().toISOString()
-    };
+    id: 'event_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+    name: document.getElementById('eventName').value,
+    description: document.getElementById('eventDescription').value,
+    date: document.getElementById('eventDate').value,
+    startTime: document.getElementById('eventStartTime').value,
+    endTime: document.getElementById('eventEndTime').value,
+    status: 'active',
+    createdAt: new Date().toISOString(),
+    createdById: currentAdmin.id   // ✅ ADD THIS
+};
 
     events.push(newEvent);
     localStorage.setItem('events', JSON.stringify(events));
