@@ -34,40 +34,39 @@ function loadAdmins() {
         updateStats();
     }
 
-// ----------------- Render events Per Admin Bar Chart -----------------
-let eventsPerAdminChart;
+// ----------------- Render Events Per Admin Bar Chart -----------------
+let eventsPerAdminChart = null;
 
 function renderEventsPerAdminChart() {
-    const users = getUsers(); // admin + students
+
+    const users = getUsers();
     const admins = users.filter(u => u.role === 'admin');
+    const events = getEvents();
 
-    const events = getEvents(); // you must have a function that returns all events
+    const canvas = document.getElementById('eventsPerAdminChart');
+    if (!canvas || !admins.length) return;
 
-    if (!admins.length) return;
-
-    const adminLabels = admins.map(a => a.firstName + ' ' + a.lastName);
-    const eventCounts = admins.map(admin =>
-        events.filter(e => e.adminId === admin.id).length
-    );
-
-    console.log("Admins:", adminLabels);
-    console.log("Event counts:", eventCounts);
-
-    const canvas = document.getElementById('eventsPerAdminChart'); // update your HTML id
-    canvas.height = 400;
     const ctx = canvas.getContext('2d');
 
-    if (eventsPerAdminChart) eventsPerAdminChart.destroy();
+    const labels = admins.map(a => `${a.firstName} ${a.lastName}`);
+    const data = admins.map(admin =>
+        events.filter(e => e.createdById === admin.id).length
+    );
 
-    eventsPerAdminChart = new Chart(ctx, {
+    // Destroy previous chart instance before creating a new one
+    if (eventsPerAdminChart) {
+        eventsPerAdminChart.destroy();
+    }
+
+     eventsPerAdminChart = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: adminLabels,
+            labels,
             datasets: [{
-                label: 'Number of Events',
-                data: eventCounts,
-                backgroundColor: 'rgba(75, 192, 192, 0.7)',
-                borderColor: 'rgba(75, 192, 192, 1)',
+                label: 'Events per Admin',
+                data,
+                backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                borderColor: 'rgba(54, 162, 235, 1)',
                 borderWidth: 1,
                 borderRadius: 4
             }]
@@ -75,13 +74,8 @@ function renderEventsPerAdminChart() {
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: {
-                legend: { display: false },
-                title: { display: true, text: 'Events Per Admin' }
-            },
             scales: {
-                y: { beginAtZero: true, ticks: { precision: 0 } },
-                x: { ticks: { autoSkip: false } }
+                y: { beginAtZero: true, ticks: { precision: 0 } }
             }
         }
     });
@@ -103,7 +97,7 @@ function updateStats() {
         renderStudentStatusChart(pending.length, verified.length);
     }
 
-    renderEventsPerAdminChart(); // updated
+    renderEventsPerAdminChart();
 }
 
 // Delete admin and reload table
@@ -133,10 +127,11 @@ createAdminForm?.addEventListener('submit', e => {
     });
 
 // Logout
-logoutBtn?.addEventListener('click', () => {
-        saveCurrentUser(null);
-        window.location.replace('index.html');
-    });
+const logoutBtn = document.getElementById('logoutBtn');
+        logoutBtn?.addEventListener('click', () => {
+            saveCurrentUser(null);
+            window.location.replace('index.html');
+        });
 
 // Initial load
 loadAdmins();
