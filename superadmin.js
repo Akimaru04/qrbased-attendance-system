@@ -44,38 +44,54 @@ function renderEventsPerAdminChart() {
     const events = getEvents();
 
     const canvas = document.getElementById('eventsPerAdminChart');
-    if (!canvas || !admins.length) return;
+    if (!canvas) return;
 
     const ctx = canvas.getContext('2d');
 
+    // If no admins exist, destroy chart and exit
+    if (!admins.length) {
+        if (eventsPerAdminChart) {
+            eventsPerAdminChart.destroy();
+            eventsPerAdminChart = null;
+        }
+        return;
+    }
+
     const labels = admins.map(a => `${a.firstName} ${a.lastName}`);
-    const data = admins.map(admin =>
-        events.filter(e => e.createdById === admin.id).length
+
+    const eventCounts = admins.map(admin =>
+        events.filter(event => event.createdById === admin.id).length
     );
 
-    // Destroy previous chart instance before creating a new one
+    // Destroy previous chart instance
     if (eventsPerAdminChart) {
         eventsPerAdminChart.destroy();
     }
 
-     eventsPerAdminChart = new Chart(ctx, {
+    eventsPerAdminChart = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels,
+            labels: labels,
             datasets: [{
                 label: 'Events per Admin',
-                data,
-                backgroundColor: 'rgba(54, 162, 235, 0.7)',
-                borderColor: 'rgba(54, 162, 235, 1)',
-                borderWidth: 1,
-                borderRadius: 4
+                data: eventCounts,
+                backgroundColor: 'rgba(75, 192, 192, 0.7)',
+                borderRadius: 6
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            plugins: {
+                legend: { display: true }
+            },
             scales: {
-                y: { beginAtZero: true, ticks: { precision: 0 } }
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        precision: 0
+                    }
+                }
             }
         }
     });
